@@ -1,3 +1,4 @@
+import colors from "@/configs/colors";
 import React from "react";
 import styled from "styled-components";
 
@@ -28,6 +29,18 @@ const SectionContainer = styled.div`
     transition: opacity 0.4s linear;
     opacity: ${({ isSignInSection }) => (isSignInSection ? "1" : "0")};
     transform: translate(-50%, 0%);
+  }
+
+  & > svg {
+    cursor: pointer;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    transition: color 0.15s linear;
+    color: ${colors.blue};
+    :hover {
+      color: ${colors.purble};
+    }
   }
 
   width: 50%;

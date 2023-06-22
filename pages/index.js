@@ -33,20 +33,18 @@ const ContainerInner = styled.div`
 const SectionSwitcher = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   padding: 20px;
   position: absolute;
-  background: rgb(153, 19, 116);
   background: linear-gradient(
     55deg,
     rgba(153, 19, 116, 1) 0%,
     rgba(35, 122, 161, 1) 81%
   );
-  left: 0;
   transform: ${({ position }) =>
     position ? "translateX(0)" : "translateX(100%)"};
-  top: 0;
+
   width: 50%;
   z-index: 1;
   transition: all 0.35s linear;
@@ -70,7 +68,7 @@ const index = () => {
   const [isSignInSection, setIsSignInSection] = useState(true);
   const [signInValues, setSignInValues] = useState({ ...signInInitials });
   const [height, setHeight] = useState(0);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const ref = useRef();
   const ref2 = useRef();
 
@@ -120,7 +118,9 @@ const index = () => {
             setStep={setStep}
           />
         )}
-        {step == 1 && <CodeValidation customRef={ref2} />}
+        {step == 1 && (
+          <CodeValidation step={step} setStep={setStep} customRef={ref2} />
+        )}
       </ContainerInner>
     </Container>
   );

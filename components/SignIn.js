@@ -62,6 +62,7 @@ const SignIn = ({
       setErrorMessage(null);
       return user;
     } catch (err) {
+      console.log(err);
       if (err.response.status >= 400 || err.response.status <= 499) {
         setErrorMessage("Invalid Data");
       } else {

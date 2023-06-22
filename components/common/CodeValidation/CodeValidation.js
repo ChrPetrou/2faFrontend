@@ -1,13 +1,14 @@
 import React, { useRef, useState } from "react";
 import Section from "../Section";
-import * as Yup from "yup";
+import { IoMdArrowRoundBack } from "react-icons/io";
 import { Formik } from "formik";
 import Form from "@/components/FormComponents/Form";
 import InputNum from "./InputNum";
 import CTA from "../CTA";
 import { userApiAgent } from "@/utils/userApiAgent";
+import colors from "@/configs/colors";
 
-const CodeValidation = ({ isSignInSection, customRef }) => {
+const CodeValidation = ({ isSignInSection, customRef, step, setStep }) => {
   const inputRefs = useRef([]);
 
   const handleInput = (index, e) => {
@@ -41,22 +42,28 @@ const CodeValidation = ({ isSignInSection, customRef }) => {
     <Section
       customRef={customRef}
       isSignInSection={isSignInSection ? false : true}
-      title={"Verify Code"}
+      title={"Two-Factor Authentication"}
     >
+      <IoMdArrowRoundBack size={30} onClick={() => setStep(step - 1)} />
       <Formik
         initialValues={{
           myArray: ["", "", "", "", "", ""], // Initialize the array with empty values
         }}
         onSubmit={async (values) => {
           const email = JSON.parse(sessionStorage.getItem("User")).user.email;
-          console.log(values.myArray.join(""));
+
           const response = await authFunction(values.myArray.join(""), email);
+          if (response) {
+            console.log(response);
+          }
         }}
       >
         {({ handleSubmit, handleChange, values }) => (
           <>
             <Form style={{ flexDirection: "row", flexWrap: "wrap" }}>
-              <p>Two-Factor Authantication</p>
+              <p>
+                A message with a verification code has been sent to your device.
+              </p>
 
               {Array.from({ length: 6 }, (_, index) => {
                 return (
@@ -73,11 +80,15 @@ const CodeValidation = ({ isSignInSection, customRef }) => {
                 );
               })}
 
-              <p>
-                A message with a verification code has been sent to your
-                device.Enter the code to continue.
-              </p>
-              <CTA onClick={() => handleSubmit()} text={"Verify"} />
+              <p>Enter the code to continue.</p>
+              <CTA
+                disabled={values.myArray.join("").length < 6}
+                onClick={() => handleSubmit()}
+                text={"Verify"}
+              />
+              <span onClick={() => console.log()}>
+                Didn't get a verification code?
+              </span>
             </Form>
           </>
         )}

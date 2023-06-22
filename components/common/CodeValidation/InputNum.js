@@ -23,12 +23,16 @@ const InputContainer = styled.div`
     border: ${({ hasError }) =>
       hasError ? "1px solid red" : `1px solid ${colors.lightestGray}`};
   }
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px white inset;
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
+  input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+  }
+
   & input:focus {
     border: 2px solid ${colors.lightestGray};
   }

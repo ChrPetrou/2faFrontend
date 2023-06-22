@@ -29,11 +29,20 @@ const ButtonContainer = styled.div`
       rgba(35, 122, 161, 1) 96%
     );
   }
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 `;
 
-const CTA = ({ onClick, text, mWidth = "200px", style }) => {
+const CTA = ({ disabled, onClick, text, mWidth = "200px", style }) => {
   return (
-    <ButtonContainer style={style} mWidth={mWidth} onClick={onClick}>
+    <ButtonContainer
+      className={disabled && "disabled"}
+      style={style}
+      mWidth={mWidth}
+      onClick={onClick}
+    >
       <p>{text}</p>
     </ButtonContainer>
   );
