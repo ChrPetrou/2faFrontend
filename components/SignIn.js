@@ -1,6 +1,6 @@
 import { userApiAgent } from "@/utils/userApiAgent";
 import { Formik } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import * as Yup from "yup";
 import CTA from "./common/CTA";
@@ -28,20 +28,13 @@ const changeText = keyframes`
   }
 `;
 
-const SignIn = ({
-  isSignInSection,
-  step,
-  setStep,
-  customRef,
-  initialValues,
-  setIntialValues,
-}) => {
+const SignIn = ({ isSignInSection, step, setStep, customRef }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
-
-  const handleTogglePassword = () => {
-    setPasswordVisible(!passwordVisible);
-  };
+  const [initialValues, setInitialValues] = useState({
+    email: "",
+    password: "",
+  });
   const [errorMessage, setErrorMessage] = useState("");
   const signInSchema = Yup.object().shape({
     email: Yup.string()
@@ -64,13 +57,22 @@ const SignIn = ({
     } catch (err) {
       console.log(err);
       if (err.response.status >= 400 || err.response.status <= 499) {
-        setErrorMessage("Invalid Data");
+        setErrorMessage("Incorrect email address or password");
       } else {
         setErrorMessage(err.response.data.message);
       }
     }
   };
 
+  useEffect(() => {
+    const storage = JSON.parse(sessionStorage.getItem("User")).user;
+
+    if (storage) {
+      setInitialValues({ email: storage?.email, password: "" });
+    }
+  }, []);
+
+  // console.log(initialValues.email);
   return (
     <Section
       customRef={customRef}
@@ -79,10 +81,7 @@ const SignIn = ({
       // subtitle={"Already have an account?"}
     >
       <Formik
-        initialValues={{
-          email: "",
-          password: "",
-        }}
+        initialValues={initialValues}
         validationSchema={signInSchema}
         onSubmit={async (values) => {
           // same shape as initial values
@@ -93,6 +92,9 @@ const SignIn = ({
             setStep(step + 1);
           }
         }}
+        validateOnBlur={true}
+        validateOnChange={true}
+        enableReinitialize={true}
       >
         {({ errors, touched, handleChange, handleSubmit, values }) => (
           <>
@@ -119,13 +121,13 @@ const SignIn = ({
                 type={passwordVisible ? "text" : "password"}
                 onChange={handleChange}
               >
-                {!passwordVisible && values.password.length != 0 && (
+                {!passwordVisible && values?.password?.length != 0 && (
                   <AiOutlineEyeInvisible
                     size={20}
                     onClick={() => setPasswordVisible(!passwordVisible)}
                   />
                 )}
-                {passwordVisible && values.password.length != 0 && (
+                {passwordVisible && values?.password?.length != 0 && (
                   <AiOutlineEye
                     size={20}
                     onClick={() => setPasswordVisible(!passwordVisible)}

@@ -14,6 +14,7 @@ const InputContainer = styled.div`
     padding: 10px;
     width: 100%;
     border-radius: 8px;
+    background: white;
     outline: none;
     border: ${({ hasError }) =>
       hasError ? "1px solid red" : `1px solid ${colors.lightestGray}`};
@@ -64,6 +65,7 @@ const InputContainer = styled.div`
   & input:focus + *,
   &[data-valid="true"] > input + * {
     transform: translate(10px, calc(-50% - 0px));
+    background: white;
   }
   @media screen and (max-width: 650px) {
     max-width: 100%;
