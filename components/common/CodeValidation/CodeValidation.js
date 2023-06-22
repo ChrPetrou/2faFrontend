@@ -5,6 +5,7 @@ import { Formik } from "formik";
 import Form from "@/components/FormComponents/Form";
 import InputNum from "./InputNum";
 import CTA from "../CTA";
+import { userApiAgent } from "@/utils/userApiAgent";
 
 const CodeValidation = ({ isSignInSection, customRef }) => {
   const inputRefs = useRef([]);
@@ -17,14 +18,23 @@ const CodeValidation = ({ isSignInSection, customRef }) => {
     }
     if (currentLength >= maxLength && inputRefs.current[index + 1]) {
       inputRefs.current[index + 1].focus();
-      console.log(inputRefs.current[index + 1]);
-    } else {
-      inputRefs.current[0].focus();
     }
   };
 
   const handleRef = (ref, index) => {
     inputRefs.current[index] = ref;
+  };
+
+  const authFunction = async (values, email) => {
+    try {
+      const auth = await userApiAgent.authanticate({
+        email: email,
+        code: values,
+      });
+      return auth;
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -37,8 +47,10 @@ const CodeValidation = ({ isSignInSection, customRef }) => {
         initialValues={{
           myArray: ["", "", "", "", "", ""], // Initialize the array with empty values
         }}
-        onSubmit={(values) => {
-          console.log(values);
+        onSubmit={async (values) => {
+          const email = JSON.parse(sessionStorage.getItem("User")).user.email;
+          console.log(values.myArray.join(""));
+          const response = await authFunction(values.myArray.join(""), email);
         }}
       >
         {({ handleSubmit, handleChange, values }) => (

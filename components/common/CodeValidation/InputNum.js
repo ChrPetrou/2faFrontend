@@ -13,6 +13,7 @@ const InputContainer = styled.div`
 
   & input {
     display: flex;
+    margin: auto;
     padding: 10px;
     width: 100%;
     border-radius: 8px;
