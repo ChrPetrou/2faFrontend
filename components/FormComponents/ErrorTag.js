@@ -6,14 +6,15 @@ const ErrorTagContainer = styled.div`
   position: absolute;
   top: calc(100% + 5px);
   width: 100%;
+  max-width: 350px;
   & p {
     color: red;
   }
 `;
 
-const ErrorTag = ({ text }) => {
+const ErrorTag = ({ text, style }) => {
   return (
-    <ErrorTagContainer>
+    <ErrorTagContainer style={style}>
       <p>{text}</p>
     </ErrorTagContainer>
   );

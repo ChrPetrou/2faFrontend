@@ -5,6 +5,8 @@ import styled from "styled-components";
 const InputContainer = styled.div`
   width: 100%;
   position: relative;
+  display: flex;
+  gap: 10px;
   margin: 10px 0;
   max-width: ${({ mWidth }) => mWidth};
   & input {
@@ -44,6 +46,19 @@ const InputContainer = styled.div`
         rgba(35, 122, 161, 1) 96%
       );
     }
+  }
+
+  & svg {
+    /* position: absolute; */
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    margin-right: 10px;
+    background: white;
+    /* margin-right: calc(0px + 10px); */
   }
 
   & input:focus + *,

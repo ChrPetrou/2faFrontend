@@ -1,12 +1,11 @@
 import { Formik } from "formik";
 import React from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import * as Yup from "yup";
 import CTA from "./common/CTA";
 import Section from "./common/Section";
 import ErrorTag from "./FormComponents/ErrorTag";
 import Form from "./FormComponents/Form";
-import InputField from "./FormComponents/InputField";
 import "yup-phone";
 import InputF from "./FormComponents/InputF";
 

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import * as Yup from "yup";
 import CTA from "@/components/common/CTA";
 import SignIn from "@/components/SignIn";
-import CodeValidation from "@/components/CodeValidation";
+import CodeValidation from "@/components/common/CodeValidation/CodeValidation";
 import signInInitials from "@/configs/signInInitials";
 import Register from "@/components/Regsiter";
 
@@ -70,7 +70,7 @@ const index = () => {
   const [isSignInSection, setIsSignInSection] = useState(true);
   const [signInValues, setSignInValues] = useState({ ...signInInitials });
   const [height, setHeight] = useState(0);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const ref = useRef();
   const ref2 = useRef();
 
@@ -120,7 +120,7 @@ const index = () => {
             setStep={setStep}
           />
         )}
-        {step == 1 && <CodeValidation />}
+        {step == 1 && <CodeValidation customRef={ref2} />}
       </ContainerInner>
     </Container>
   );

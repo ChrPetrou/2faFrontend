@@ -1,5 +1,6 @@
+import { userApiAgent } from "@/utils/userApiAgent";
 import { Formik } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import styled, { keyframes } from "styled-components";
 import * as Yup from "yup";
 import CTA from "./common/CTA";
@@ -7,7 +8,7 @@ import Section from "./common/Section";
 import ErrorTag from "./FormComponents/ErrorTag";
 import Form from "./FormComponents/Form";
 import InputF from "./FormComponents/InputF";
-import InputField from "./FormComponents/InputField";
+import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
 
 const changeText = keyframes`
   0% {
@@ -35,12 +36,39 @@ const SignIn = ({
   initialValues,
   setIntialValues,
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const handleTogglePassword = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+  const [errorMessage, setErrorMessage] = useState("");
   const signInSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Required"),
+    email: Yup.string()
+      .email("Invalid email")
+      .matches(
+        /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|net)$/,
+        "Invalid email format"
+      )
+      .required("Required"),
     password: Yup.string()
       .required()
-      .min(8, "Password must be 8 characters long"),
+      .min(3, "Password must be 8 characters long"),
   });
+
+  const signInFunction = async (value) => {
+    try {
+      const user = await userApiAgent.signIn(value);
+      setErrorMessage(null);
+      return user;
+    } catch (err) {
+      if (err.response.status >= 400 || err.response.status <= 499) {
+        setErrorMessage("Invalid Data");
+      } else {
+        setErrorMessage(err.response.data.message);
+      }
+    }
+  };
 
   return (
     <Section
@@ -55,16 +83,19 @@ const SignIn = ({
           password: "",
         }}
         validationSchema={signInSchema}
-        onSubmit={(values) => {
+        onSubmit={async (values) => {
           // same shape as initial values
-          sessionStorage.setItem("User", JSON.stringify(values.email));
-          setStep(step + 1);
-          console.log(values);
+          const response = await signInFunction(values);
+          if (response) {
+            console.log(response);
+            sessionStorage.setItem("User", JSON.stringify(response));
+            setStep(step + 1);
+          }
         }}
       >
         {({ errors, touched, handleChange, handleSubmit, values }) => (
           <>
-            <Form action="/action_page.php" method="post">
+            <Form>
               <InputF
                 label={"Email"}
                 mWidth={"50%"}
@@ -84,13 +115,34 @@ const SignIn = ({
                 label={"Password"}
                 hasError={errors.password && touched.password}
                 name="password"
-                type={"password"}
+                type={passwordVisible ? "text" : "password"}
                 onChange={handleChange}
               >
+                {!passwordVisible && values.password.length != 0 && (
+                  <AiOutlineEyeInvisible
+                    size={20}
+                    onClick={() => setPasswordVisible(!passwordVisible)}
+                  />
+                )}
+                {passwordVisible && values.password.length != 0 && (
+                  <AiOutlineEye
+                    size={20}
+                    onClick={() => setPasswordVisible(!passwordVisible)}
+                  />
+                )}
+
                 {errors.password && touched.password && (
                   <ErrorTag text={errors.password} />
                 )}
               </InputF>
+              {errorMessage && (
+                <ErrorTag
+                  text={errorMessage}
+                  style={{
+                    justifyContent: "center",
+                  }}
+                />
+              )}
               <CTA onClick={() => handleSubmit()} text={"Sign In"} />
             </Form>
           </>

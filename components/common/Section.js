@@ -17,7 +17,6 @@ const SectionContainer = styled.div`
     position: absolute;
     font-size: 30px;
     color: white;
-    z-index: 1;
 
     /* margin-top: ${({ isSignInSection }) =>
       isSignInSection ? "20%" : "0%"}; */
