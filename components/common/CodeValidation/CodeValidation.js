@@ -53,7 +53,7 @@ const CodeValidation = ({ isSignInSection, customRef }) => {
                     type="number"
                     ref={(ref) => handleRef(ref, index)}
                     maxLength="1"
-                    id={`${values[index]}`}
+                    id={`myArray[${index}]`}
                     value={values[index]}
                     onChange={handleChange}
                     onInput={(e) => handleInput(index, e)}
