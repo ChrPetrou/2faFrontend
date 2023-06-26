@@ -78,20 +78,19 @@ const Title = styled.div`
   top: 0;
   left: 0;
   margin: auto;
-  /* width: 10px; */
+
   height: 20px;
   padding: 0 10px;
   transform: translate(10px, calc(50% - 2px));
-  /* transform: ${({ isClicked }) =>
-    isClicked
-      ? "translate(10px, calc(-50% - 0px)) "
-      : "translate(10px, calc(50% - 2px))"}; */
-
   transition: all 0.15s linear;
   background: ${({ isClicked }) => (isClicked ? "white" : "transparent")};
   position: absolute;
   & p {
     color: ${({ hasError }) => (hasError ? `red` : `${colors.lightestGray}`)};
+
+    @media only screen and (max-width: 950px) {
+      font-size: 16px;
+    }
   }
 `;
 

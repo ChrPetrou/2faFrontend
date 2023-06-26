@@ -7,6 +7,7 @@ import SignIn from "@/components/SignIn";
 import CodeValidation from "@/components/common/CodeValidation/CodeValidation";
 import signInInitials from "@/configs/signInInitials";
 import Register from "@/components/Regsiter";
+import useWindowSize from "@/utils/hooks/useWindowSize";
 
 const Container = styled.div`
   display: flex;
@@ -18,6 +19,7 @@ const Container = styled.div`
 
 const ContainerInner = styled.div`
   display: flex;
+
   /* flex-direction: column; */
   background-color: white;
   width: 100%;
@@ -42,21 +44,24 @@ const SectionSwitcher = styled.div`
     rgba(153, 19, 116, 1) 0%,
     rgba(35, 122, 161, 1) 81%
   );
-  transform: ${({ position }) =>
-    position ? "translateX(0)" : "translateX(100%)"};
+  left: ${({ position, mWidth }) =>
+    position ? "0" : `calc(100% - ${mWidth}px )`};
 
-  width: 50%;
-  z-index: 1;
+  width: ${({ mWidth }) => `${mWidth}px`};
+  z-index: 2;
   transition: all 0.35s linear;
   border-radius: 8px;
   height: 100%;
   & h1 {
+    text-align: center;
     color: white;
   }
   @media screen and (max-width: 850px) {
     height: ${({ mHeight }) => (mHeight ? `${mHeight}px` : "50%")};
     width: 100%;
+    min-width: 100%;
     transform: unset;
+    left: unset;
     top: ${({ position, mHeight }) =>
       !position ? `calc(100% - ${mHeight}px)` : "0"};
     /* transform: ${({ position }) =>
@@ -67,27 +72,36 @@ const SectionSwitcher = styled.div`
 const index = () => {
   const [isSignInSection, setIsSignInSection] = useState(true);
   const [signInValues, setSignInValues] = useState({ ...signInInitials });
-  const [height, setHeight] = useState(0);
+  const [switchHeight, setSwitchHeight] = useState(0);
+  const [switchWidth, setSwitchWidth] = useState(0);
   const [step, setStep] = useState(0);
   const ref = useRef();
   const ref2 = useRef();
 
+  const { width } = useWindowSize();
+
   useEffect(() => {
     if (isSignInSection) {
       if (ref.current) {
-        setHeight(ref.current.clientHeight);
+        setSwitchWidth(ref.current.clientWidth);
+        setSwitchHeight(ref.current.clientHeight);
       }
     } else {
       if (ref2.current) {
-        setHeight(ref2.current.clientHeight);
+        setSwitchWidth(ref2.current.clientWidth);
+        setSwitchHeight(ref2.current.clientHeight);
       }
     }
-  }, [isSignInSection]);
+  }, [isSignInSection, width]);
 
   return (
     <Container>
       <ContainerInner>
-        <SectionSwitcher position={isSignInSection} mHeight={height}>
+        <SectionSwitcher
+          position={isSignInSection}
+          mWidth={switchWidth}
+          mHeight={switchHeight}
+        >
           <h1>
             {isSignInSection
               ? "Don't have an account?"
