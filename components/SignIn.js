@@ -67,7 +67,7 @@ const SignIn = ({ isSignInSection, step, setStep, customRef }) => {
   useEffect(() => {
     const storage = JSON.parse(sessionStorage.getItem("User"));
 
-    if (storage) {
+    if (storage?.user) {
       setInitialValues({ email: storage?.user.email, password: "" });
     }
   }, []);
