@@ -14,7 +14,7 @@ const InputContainer = styled.div`
     padding: 10px;
     width: 100%;
     border-radius: 8px;
-    background: white;
+    background: ${({ inputBg }) => inputBg};
     outline: none;
     border: ${({ hasError }) =>
       hasError ? "1px solid red" : `1px solid ${colors.lightestGray}`};
@@ -26,27 +26,13 @@ const InputContainer = styled.div`
     -webkit-box-shadow: 0 0 0 30px white inset;
   }
 
-  & input[type="submit"] {
-    overflow: hidden;
-    transition: background 1s linear;
-    background: linear-gradient(
-      55deg,
-      rgba(153, 19, 116, 1) 0%,
-      rgba(35, 122, 161, 1) 81%
-    );
-    display: flex;
-    justify-content: center;
-    max-width: 200px;
-    margin: auto;
-    color: white;
-    cursor: pointer;
-    :hover {
-      background: linear-gradient(
-        55deg,
-        rgba(153, 19, 116, 1) 56%,
-        rgba(35, 122, 161, 1) 96%
-      );
-    }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
   }
 
   & svg {
@@ -65,7 +51,7 @@ const InputContainer = styled.div`
   & input:focus + *,
   &[data-valid="true"] > input + * {
     transform: translate(10px, calc(-50% - 0px));
-    background: white;
+    background: ${({ labelClr }) => labelClr};
   }
   @media screen and (max-width: 650px) {
     max-width: 100%;
@@ -83,10 +69,11 @@ const Title = styled.div`
   padding: 0 10px;
   transform: translate(10px, calc(50% - 2px));
   transition: all 0.15s linear;
-  background: ${({ isClicked }) => (isClicked ? "white" : "transparent")};
+  background: ${({ isClicked, labelBg }) =>
+    isClicked ? labelBg : "transparent"};
   position: absolute;
   & p {
-    color: ${({ hasError }) => (hasError ? `red` : `${colors.lightestGray}`)};
+    color: ${({ hasError, labelClr }) => (hasError ? `red` : `${labelClr}`)};
 
     @media only screen and (max-width: 950px) {
       font-size: 16px;
@@ -104,6 +91,9 @@ const InputF = ({
   hasError,
   children,
   label,
+  inputBg = "white",
+  labelBg = "white",
+  labelClr = colors.lightestGray,
   mWidth = "calc(50% - 5px)",
   ...rest
 }) => {
@@ -123,11 +113,17 @@ const InputF = ({
     <InputContainer
       hasError={hasError}
       mWidth={mWidth}
+      inputBg={inputBg}
       onClick={() => setIsClicked(true)}
       data-valid={rest.value !== ""}
     >
-      <input {...rest} />
-      <Title hasError={hasError} isClicked={isClicked}>
+      <input autoComplete="nope" {...rest} />
+      <Title
+        hasError={hasError}
+        isClicked={isClicked}
+        labelBg={labelBg}
+        labelClr={labelClr}
+      >
         <p>{label}</p>
       </Title>
       {children}

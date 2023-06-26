@@ -1,5 +1,5 @@
 import { Formik } from "formik";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import * as yup from "yup";
 import CTA from "./common/CTA";
@@ -9,7 +9,7 @@ import Form from "./FormComponents/Form";
 import "yup-phone";
 import InputF from "./FormComponents/InputF";
 import { isValidNumber } from "libphonenumber-js";
-import Selection from "./FormComponents/Selection";
+import PhoneSelection from "./FormComponents/PhoneSelection";
 
 const Test = styled.div`
   display: flex;
@@ -39,6 +39,8 @@ const Register = ({
   customRef,
   setIntialValues,
 }) => {
+  const [phoneDialCode, setPhoneDialCode] = useState("+357");
+  const [cleanNumber, setCleanNumber] = useState("");
   //custome phoneSchema for phone validation
   const phoneSchema = yup.string().test({
     name: "phone",
@@ -75,17 +77,23 @@ const Register = ({
     password: yup
       .string()
       .required("Required")
-      .min(8, "Password must be 8 characters long")
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-      ),
+      .min(8, "Password must be 8 characters long"),
+    // .matches(
+    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+    //   "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    // ),
     confirmPassword: yup
       .string()
       .required("Required")
       .oneOf([yup.ref("password"), null], "Passwords must match"),
     phoneNumber: phoneSchema.required("Phone number is required"),
   });
+
+  const handlePhone = (value, setFieldValue, phoneNumber) => {
+    setCleanNumber(value);
+    setFieldValue("phoneNumber", phoneDialCode + value);
+    console.log(phoneNumber);
+  };
 
   return (
     <Section
@@ -105,11 +113,19 @@ const Register = ({
         }}
         validationSchema={signupSchema}
         onSubmit={(values) => {
+          console.log(values);
           sessionStorage.setItem("User", JSON.stringify(values.email));
           setStep(step + 1);
         }}
       >
-        {({ errors, touched, handleChange, handleSubmit, values }) => (
+        {({
+          errors,
+          touched,
+          handleChange,
+          handleSubmit,
+          setFieldValue,
+          values,
+        }) => (
           <>
             <Form method="post">
               <Test>
@@ -143,6 +159,7 @@ const Register = ({
               <Test>
                 <InputF
                   label={"Email"}
+                  autoComplete="false"
                   value={values.email}
                   mWidth={"calc(50% - 10px)"}
                   hasError={errors.email && touched.email}
@@ -155,28 +172,25 @@ const Register = ({
                   )}
                 </InputF>
                 <PhoneContainer>
-                  <Selection
-                    label={"Phone Number"}
-                    value={values.phoneNumber}
-                    mWidth={"100%"}
-                    hasError={errors.phoneNumber && touched.phoneNumber}
-                    name="phoneNumber"
-                    type={"tel"}
-                    onChange={handleChange}
-                  >
-                    {errors.phoneNumber && touched.phoneNumber && (
-                      <ErrorTag text={errors.phoneNumber} />
-                    )}
-                  </Selection>
+                  <PhoneSelection
+                    phoneDialCode={phoneDialCode}
+                    setPhoneDialCode={setPhoneDialCode}
+                  />
                   <InputF
                     label={"Phone Number"}
-                    value={values.phoneNumber}
+                    value={cleanNumber}
                     mWidth={"100%"}
                     style={{ borderRadius: "0px 8px 8px 0px " }}
                     hasError={errors.phoneNumber && touched.phoneNumber}
                     name="phoneNumber"
-                    type={"tel"}
-                    onChange={handleChange}
+                    type={"number"}
+                    onChange={(e) => {
+                      handlePhone(
+                        e.target.value,
+                        setFieldValue,
+                        values.phoneNumber
+                      );
+                    }}
                   >
                     {errors.phoneNumber && touched.phoneNumber && (
                       <ErrorTag text={errors.phoneNumber} />
@@ -204,7 +218,7 @@ const Register = ({
                   label={"Confirm Password"}
                   hasError={errors.confirmPassword && touched.confirmPassword}
                   name="confirmPassword"
-                  type={"paswword"}
+                  type={"password"}
                   onChange={handleChange}
                 >
                   {errors.confirmPassword && touched.confirmPassword && (

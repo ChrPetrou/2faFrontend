@@ -98,7 +98,7 @@ const SignIn = ({ isSignInSection, step, setStep, customRef }) => {
       >
         {({ errors, touched, handleChange, handleSubmit, values }) => (
           <>
-            <Form>
+            <Form autoComplete="off">
               <InputF
                 label={"Email"}
                 mWidth={"50%"}
@@ -106,6 +106,7 @@ const SignIn = ({ isSignInSection, step, setStep, customRef }) => {
                 name="email"
                 value={values.email}
                 type={"email"}
+                autoComplete="off"
                 onChange={handleChange}
               >
                 {errors.email && touched.email && (
@@ -116,6 +117,7 @@ const SignIn = ({ isSignInSection, step, setStep, customRef }) => {
                 value={values.password}
                 mWidth={"50%"}
                 label={"Password"}
+                autoComplete="nope"
                 hasError={errors.password && touched.password}
                 name="password"
                 type={passwordVisible ? "text" : "password"}
