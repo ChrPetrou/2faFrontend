@@ -114,7 +114,7 @@ const Register = ({
         validationSchema={signupSchema}
         onSubmit={(values) => {
           console.log(values);
-          sessionStorage.setItem("User", JSON.stringify(values.email));
+          sessionStorage.setItem("User", JSON.stringify(values));
           setStep(step + 1);
         }}
       >

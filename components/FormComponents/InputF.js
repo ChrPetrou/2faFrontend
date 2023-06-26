@@ -117,7 +117,7 @@ const InputF = ({
       onClick={() => setIsClicked(true)}
       data-valid={rest.value !== ""}
     >
-      <input autoComplete="nope" {...rest} />
+      <input {...rest} />
       <Title
         hasError={hasError}
         isClicked={isClicked}
