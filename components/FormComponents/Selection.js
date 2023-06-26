@@ -108,7 +108,13 @@ const Selection = () => {
   return (
     <Container>
       <CountryContainer>
-        <InputF mWidth="100%" type={"text"} label={"Search"} />
+        <InputF
+          mWidth="100%"
+          type={"text"}
+          label={"Search"}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
         <CountrySelectionContainer>
           {countryCodes.map((element, index) => (
             <CountrySelection key={index}>
