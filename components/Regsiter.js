@@ -24,7 +24,7 @@ const PhoneContainer = styled.div`
   display: flex;
   width: 100%;
   position: relative;
-  max-width: 50%;
+  max-width: calc(50% - 10px);
   @media screen and (max-width: 880px) {
     max-width: 100%;
   }
