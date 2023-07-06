@@ -165,7 +165,7 @@ const PhoneSelection = ({ phoneCode, setphoneCode, setFieldValue, phone }) => {
                       country: element.code,
                     });
                     setFieldValue("phone", element.dial_code + phone);
-                    console.log(phone);
+
                     setIsCollapsed(false);
                   }}
                 >

@@ -15,9 +15,8 @@ const FormSchema = ({
       validationSchema={schema}
       onSubmit={async (values) => {
         const response = await Function(values);
-        console.log(response);
+
         if (response) {
-          console.log(values);
           sessionStorage.setItem("User", JSON.stringify(response));
           setStep(step + 1);
         }
