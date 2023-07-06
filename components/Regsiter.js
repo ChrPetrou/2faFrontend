@@ -10,6 +10,8 @@ import "yup-phone";
 import InputF from "./FormComponents/InputF";
 import { isValidNumber } from "libphonenumber-js";
 import PhoneSelection from "./FormComponents/PhoneSelection";
+import { userApiAgent } from "@/utils/userApiAgent";
+import axios from "axios";
 
 const Test = styled.div`
   display: flex;
@@ -39,8 +41,33 @@ const Register = ({
   customRef,
   setIntialValues,
 }) => {
-  const [phoneDialCode, setPhoneDialCode] = useState("+357");
+  const [phoneCode, setphoneCode] = useState({
+    dialCode: "",
+    country: "",
+  });
+
   const [cleanNumber, setCleanNumber] = useState("");
+
+  const getGeoInfo = () => {
+    axios
+      .get("https://ipapi.co/json/")
+      .then((response) => {
+        let data = response.data;
+        setphoneCode({
+          dialCode: data.country_calling_code,
+          country: data.country_code,
+        });
+        return;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    getGeoInfo();
+  }, []);
+
   //custome phoneSchema for phone validation
   const phoneSchema = yup.string().test({
     name: "phone",
@@ -49,9 +76,9 @@ const Register = ({
       const { path, createError } = this;
 
       try {
-        const phoneNumber = isValidNumber(value);
+        const phone = isValidNumber(value);
 
-        if (!phoneNumber) {
+        if (!phone) {
           throw createError({ path });
         }
       } catch (error) {
@@ -63,12 +90,12 @@ const Register = ({
   });
 
   let signupSchema = yup.object().shape({
-    firstName: yup
+    firstname: yup
       .string()
       .min(2, "Too Short!")
       .max(50, "Too Long!")
       .required("Required"),
-    lastName: yup
+    surname: yup
       .string()
       .min(2, "Too Short!")
       .max(50, "Too Long!")
@@ -77,7 +104,7 @@ const Register = ({
     password: yup
       .string()
       .required("Required")
-      .min(8, "Password must be 8 characters long"),
+      .min(3, "Password must be 8 characters long"),
     // .matches(
     //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
     //   "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
@@ -86,13 +113,30 @@ const Register = ({
       .string()
       .required("Required")
       .oneOf([yup.ref("password"), null], "Passwords must match"),
-    phoneNumber: phoneSchema.required("Phone number is required"),
+    phone: phoneSchema.required("Phone number is required"),
+    country: yup.string().required("Required"),
   });
 
-  const handlePhone = (value, setFieldValue, phoneNumber) => {
+  const handlePhone = (value, setFieldValue, phone) => {
     setCleanNumber(value);
-    setFieldValue("phoneNumber", phoneDialCode + value);
-    console.log(phoneNumber);
+    setFieldValue("phone", phoneCode.dialCode + value);
+  };
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const registerFunc = async (values) => {
+    try {
+      setErrorMessage("");
+      const userR = await userApiAgent.register(values);
+      setErrorMessage(null);
+      return userR;
+    } catch (err) {
+      console.log(err);
+      if (err.response.status >= 400 || err.response.status <= 499) {
+        setErrorMessage(err.response.data.message);
+      } else {
+        setErrorMessage(err.response.data.message);
+      }
+    }
   };
 
   return (
@@ -104,15 +148,18 @@ const Register = ({
     >
       <Formik
         initialValues={{
-          firstName: "",
-          lastName: "",
+          firstname: "",
+          surname: "",
           password: "",
           confirmPassword: "",
           email: "",
-          phoneNumber: "",
+          phone: "",
+          country: "",
         }}
         validationSchema={signupSchema}
-        onSubmit={(values) => {
+        onSubmit={async (values) => {
+          const response = await registerFunc(values);
+          console.log(response);
           console.log(values);
           sessionStorage.setItem("User", JSON.stringify(values));
           setStep(step + 1);
@@ -132,27 +179,27 @@ const Register = ({
                 <InputF
                   label={"First Name"}
                   mWidth={"calc(50% - 10px)"}
-                  value={values.firstName}
-                  hasError={errors.firstName && touched.firstName}
-                  name="firstName"
+                  value={values.firstname}
+                  hasError={errors.firstname && touched.firstname}
+                  name="firstname"
                   type={"text"}
                   onChange={handleChange}
                 >
-                  {errors.firstName && touched.firstName && (
-                    <ErrorTag text={errors.firstName} />
+                  {errors.firstname && touched.firstname && (
+                    <ErrorTag text={errors.firstname} />
                   )}
                 </InputF>
                 <InputF
                   label={"Last Name"}
                   mWidth={"calc(50% - 10px)"}
-                  hasError={errors.lastName && touched.lastName}
-                  name="lastName"
-                  value={values.lastName}
+                  hasError={errors.surname && touched.surname}
+                  name="surname"
+                  value={values.surname}
                   type={"text"}
                   onChange={handleChange}
                 >
-                  {errors.lastName && touched.lastName && (
-                    <ErrorTag text={errors.lastName} />
+                  {errors.surname && touched.surname && (
+                    <ErrorTag text={errors.surname} />
                   )}
                 </InputF>
               </Test>
@@ -173,27 +220,32 @@ const Register = ({
                 </InputF>
                 <PhoneContainer>
                   <PhoneSelection
-                    phoneDialCode={phoneDialCode}
-                    setPhoneDialCode={setPhoneDialCode}
+                    phoneCode={phoneCode}
+                    setphoneCode={setphoneCode}
+                    onChange={handleChange}
+                    phone={cleanNumber}
+                    setFieldValue={setFieldValue}
                   />
+                  {errors.country && touched.country && (
+                    <ErrorTag text={errors.country} />
+                  )}
                   <InputF
                     label={"Phone Number"}
                     value={cleanNumber}
                     mWidth={"100%"}
                     style={{ borderRadius: "0px 8px 8px 0px " }}
-                    hasError={errors.phoneNumber && touched.phoneNumber}
-                    name="phoneNumber"
+                    hasError={errors.phone && touched.phone}
+                    name="phone"
                     type={"number"}
+                    onInput={(e) => {
+                      handlePhone(e.target.value, setFieldValue, values.phone);
+                    }}
                     onChange={(e) => {
-                      handlePhone(
-                        e.target.value,
-                        setFieldValue,
-                        values.phoneNumber
-                      );
+                      handlePhone(e.target.value, setFieldValue, values.phone);
                     }}
                   >
-                    {errors.phoneNumber && touched.phoneNumber && (
-                      <ErrorTag text={errors.phoneNumber} />
+                    {errors.phone && touched.phone && (
+                      <ErrorTag text={errors.phone} />
                     )}
                   </InputF>
                 </PhoneContainer>
@@ -226,6 +278,14 @@ const Register = ({
                   )}
                 </InputF>
               </Test>
+              {errorMessage && (
+                <ErrorTag
+                  text={errorMessage}
+                  style={{
+                    justifyContent: "center",
+                  }}
+                />
+              )}
               <CTA onClick={() => handleSubmit()} text={"Register"} />
             </Form>
           </>

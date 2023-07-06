@@ -7,6 +7,22 @@ import InputNum from "./InputNum";
 import CTA from "../CTA";
 import { userApiAgent } from "@/utils/userApiAgent";
 import colors from "@/configs/colors";
+import styled from "styled-components";
+
+const BackContainer = styled.div`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  /* width: 1000px; */
+  transition: color 0.15s linear;
+  color: ${colors.blue};
+  :hover {
+    color: ${colors.purble};
+  }
+`;
 
 const CodeValidation = ({ isSignInSection, customRef, step, setStep }) => {
   const inputRefs = useRef([]);
@@ -37,14 +53,17 @@ const CodeValidation = ({ isSignInSection, customRef, step, setStep }) => {
       console.log(err);
     }
   };
-
+  console.log(step);
   return (
     <Section
       customRef={customRef}
-      isSignInSection={isSignInSection ? false : true}
+      isSignInSection={isSignInSection}
       title={"Two-Factor Authentication"}
     >
-      <IoMdArrowRoundBack size={30} onClick={() => setStep(step - 1)} />
+      <BackContainer>
+        <IoMdArrowRoundBack size={30} onClick={() => setStep(step - 1)} />
+        <p>Step 1</p>
+      </BackContainer>
       <Formik
         initialValues={{
           myArray: ["", "", "", "", "", ""], // Initialize the array with empty values

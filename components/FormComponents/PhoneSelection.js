@@ -2,7 +2,8 @@ import colors from "@/configs/colors";
 import countryCodes from "@/configs/countryCodes";
 import useOnClickOutside from "@/utils/hooks/useOnClickOutside";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import InputF from "./InputF";
 
@@ -115,14 +116,19 @@ const CountrySelection = styled.div`
   }
 `;
 
-const PhoneSelection = ({ phoneDialCode, setPhoneDialCode }) => {
+const PhoneSelection = ({ phoneCode, setphoneCode, setFieldValue, phone }) => {
   const [searchInput, setSearchInput] = useState("");
   const [isCollapsed, setIsCollapsed] = useState("");
   const ref = useRef();
+
+  useEffect(() => {
+    setFieldValue("country", phoneCode.country);
+  }, [phoneCode.country]);
+
   useOnClickOutside(ref, () => setIsCollapsed(false));
   return (
     <Container ref={ref} onClick={() => setIsCollapsed(!isCollapsed)}>
-      <p>{phoneDialCode}</p>
+      <p>{phoneCode.dialCode}</p>
       {isCollapsed && (
         <CountryContainer onClick={(e) => e.stopPropagation()}>
           <InputF
@@ -154,7 +160,12 @@ const PhoneSelection = ({ phoneDialCode, setPhoneDialCode }) => {
                 <CountrySelection
                   key={index}
                   onClick={() => {
-                    setPhoneDialCode(element.dial_code);
+                    setphoneCode({
+                      dialCode: element.dial_code,
+                      country: element.code,
+                    });
+                    setFieldValue("phone", element.dial_code + phone);
+                    console.log(phone);
                     setIsCollapsed(false);
                   }}
                 >

@@ -75,6 +75,7 @@ const index = () => {
   const [switchHeight, setSwitchHeight] = useState(0);
   const [switchWidth, setSwitchWidth] = useState(0);
   const [step, setStep] = useState(0);
+  const [reStep, setReStep] = useState(0);
   const ref = useRef();
   const ref2 = useRef();
 
@@ -108,7 +109,9 @@ const index = () => {
               : "Already have an account?"}
           </h1>
           <CTA
-            onClick={() => setIsSignInSection(!isSignInSection)}
+            onClick={() => {
+              setIsSignInSection(!isSignInSection);
+            }}
             text={isSignInSection ? "Register" : "Sign In"}
             mWidth={"200px"}
             style={{
@@ -117,13 +120,23 @@ const index = () => {
             }}
           />
         </SectionSwitcher>
-        <Register
-          customRef={ref}
-          isSignInSection={isSignInSection}
-          step={step}
-          setStep={setStep}
-        />
+        {reStep == 0 && (
+          <Register
+            customRef={ref}
+            isSignInSection={isSignInSection}
+            step={reStep}
+            setStep={setReStep}
+          />
+        )}
 
+        {reStep == 1 && (
+          <CodeValidation
+            isSignInSection={isSignInSection}
+            step={reStep}
+            setStep={setReStep}
+            customRef={ref}
+          />
+        )}
         {step == 0 && (
           <SignIn
             customRef={ref2}
@@ -133,7 +146,12 @@ const index = () => {
           />
         )}
         {step == 1 && (
-          <CodeValidation step={step} setStep={setStep} customRef={ref2} />
+          <CodeValidation
+            isSignInSection={!isSignInSection}
+            step={step}
+            setStep={setStep}
+            customRef={ref2}
+          />
         )}
       </ContainerInner>
     </Container>

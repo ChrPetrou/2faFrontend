@@ -19,15 +19,6 @@ const SectionContainer = styled.div`
   }
 
   & > svg {
-    cursor: pointer;
-    position: absolute;
-    left: 10px;
-    top: 10px;
-    transition: color 0.15s linear;
-    color: ${colors.blue};
-    :hover {
-      color: ${colors.purble};
-    }
   }
 
   @media screen and (max-width: 850px) {
