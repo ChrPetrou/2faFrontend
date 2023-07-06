@@ -9,6 +9,7 @@ import ErrorTag from "./FormComponents/ErrorTag";
 import Form from "./FormComponents/Form";
 import InputF from "./FormComponents/InputF";
 import { AiOutlineEyeInvisible, AiOutlineEye } from "react-icons/ai";
+import FormSchema from "./FormComponents/FormSchema";
 
 const changeText = keyframes`
   0% {
@@ -72,7 +73,6 @@ const SignIn = ({ isSignInSection, step, setStep, customRef }) => {
     }
   }, []);
 
-  // console.log(initialValues.email);
   return (
     <Section
       customRef={customRef}
@@ -80,21 +80,12 @@ const SignIn = ({ isSignInSection, step, setStep, customRef }) => {
       title={"Sign In"}
       // subtitle={"Already have an account?"}
     >
-      <Formik
+      <FormSchema
+        schema={signInSchema}
         initialValues={initialValues}
-        validationSchema={signInSchema}
-        onSubmit={async (values) => {
-          // same shape as initial values
-          const response = await signInFunction(values);
-          if (response) {
-            console.log(response);
-            sessionStorage.setItem("User", JSON.stringify(response));
-            setStep(step + 1);
-          }
-        }}
-        validateOnBlur={true}
-        validateOnChange={true}
-        enableReinitialize={true}
+        Function={signInFunction}
+        setStep={setStep}
+        step={step}
       >
         {({ errors, touched, handleChange, handleSubmit, values }) => (
           <>
@@ -152,7 +143,7 @@ const SignIn = ({ isSignInSection, step, setStep, customRef }) => {
             </Form>
           </>
         )}
-      </Formik>
+      </FormSchema>
     </Section>
   );
 };

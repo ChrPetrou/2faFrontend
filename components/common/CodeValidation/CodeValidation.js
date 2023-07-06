@@ -53,7 +53,7 @@ const CodeValidation = ({ isSignInSection, customRef, step, setStep }) => {
       console.log(err);
     }
   };
-  console.log(step);
+
   return (
     <Section
       customRef={customRef}

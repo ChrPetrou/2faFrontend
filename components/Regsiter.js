@@ -12,6 +12,8 @@ import { isValidNumber } from "libphonenumber-js";
 import PhoneSelection from "./FormComponents/PhoneSelection";
 import { userApiAgent } from "@/utils/userApiAgent";
 import axios from "axios";
+import countryCodes from "@/configs/countryCodes";
+import FormSchema from "./FormComponents/FormSchema";
 
 const Test = styled.div`
   display: flex;
@@ -33,20 +35,22 @@ const PhoneContainer = styled.div`
   /* border: 1px solid red; */
 `;
 
-const Register = ({
-  isSignInSection,
-  step,
-  setStep,
-  initialValues,
-  customRef,
-  setIntialValues,
-}) => {
+const Register = ({ isSignInSection, step, setStep, customRef }) => {
   const [phoneCode, setphoneCode] = useState({
     dialCode: "",
     country: "",
   });
 
   const [cleanNumber, setCleanNumber] = useState("");
+  const [initialValues, setInitialValues] = useState({
+    firstname: "",
+    surname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    country: "",
+  });
 
   const getGeoInfo = () => {
     axios
@@ -63,10 +67,6 @@ const Register = ({
         console.log(error);
       });
   };
-
-  useEffect(() => {
-    getGeoInfo();
-  }, []);
 
   //custome phoneSchema for phone validation
   const phoneSchema = yup.string().test({
@@ -105,10 +105,6 @@ const Register = ({
       .string()
       .required("Required")
       .min(3, "Password must be 8 characters long"),
-    // .matches(
-    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-    //   "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-    // ),
     confirmPassword: yup
       .string()
       .required("Required")
@@ -119,7 +115,7 @@ const Register = ({
 
   const handlePhone = (value, setFieldValue, phone) => {
     setCleanNumber(value);
-    setFieldValue("phone", phoneCode.dialCode + value);
+    setFieldValue("phone", phoneCode.dialCode + " " + value);
   };
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -139,6 +135,35 @@ const Register = ({
     }
   };
 
+  useEffect(() => {
+    const storage = JSON.parse(sessionStorage.getItem("User"));
+
+    if (storage?.user) {
+      let country = "";
+      let phone = storage?.user.phone;
+      countryCodes.map((element, index) => {
+        if (phone.startsWith(element.dial_code)) {
+          country = element.code;
+          setphoneCode({ dialCode: element.dial_code, country: element.code });
+          setCleanNumber(phone.substring(element.dial_code.length));
+        }
+      });
+      setInitialValues({
+        firstname: storage?.user.firstName,
+        surname: storage?.user.lastName,
+        email: storage?.user.email,
+        password: "",
+        confirmPassword: "",
+        phone: phone,
+        country: country,
+      });
+    } else {
+      getGeoInfo();
+    }
+  }, []);
+
+  console.log(initialValues.phone);
+
   return (
     <Section
       customRef={customRef}
@@ -146,24 +171,12 @@ const Register = ({
       title={"Register"}
       // subtitle={`Don't have an account?`}
     >
-      <Formik
-        initialValues={{
-          firstname: "",
-          surname: "",
-          password: "",
-          confirmPassword: "",
-          email: "",
-          phone: "",
-          country: "",
-        }}
-        validationSchema={signupSchema}
-        onSubmit={async (values) => {
-          const response = await registerFunc(values);
-          console.log(response);
-          console.log(values);
-          sessionStorage.setItem("User", JSON.stringify(values));
-          setStep(step + 1);
-        }}
+      <FormSchema
+        schema={signupSchema}
+        initialValues={initialValues}
+        Function={registerFunc}
+        setStep={setStep}
+        step={step}
       >
         {({
           errors,
@@ -290,7 +303,7 @@ const Register = ({
             </Form>
           </>
         )}
-      </Formik>
+      </FormSchema>
     </Section>
   );
 };
